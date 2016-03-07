@@ -135,7 +135,7 @@ FB_ACCEL_PUV3_UNIGFX=0xa0
 
 
 from mmap import mmap
-from fcntl import ioctl
+from ioctl import *
 import struct
 
 mm = None
@@ -256,17 +256,19 @@ def show_img(img):
 
 def gif_loop(gif, event=None):
   from PIL import ImageSequence
-  from threading import Thread, Lock
+  from threading import Thread, Event, Timer
   from itertools import cycle
   ready_fb()
-  i,l = 0,None
   
   imgs = []
   for img in ImageSequence.Iterator(gif):
-    imgs.append(RGB_to_BGR(img.convert('RGB')))
+    imgs.append((RGB_to_BGR(img.convert('RGB')), img.info['duration']/1000))
   
-  for img in cycle(imgs):
+  for img, dur in cycle(imgs):
+    e=Event()
+    Timer(dur, lambda e:e.set(), [e]).start()
     show_img(img)
+    e.wait() # wait for animation frame duration
     if event and event.is_set():
       break
   if event: event.clear()
@@ -282,8 +284,7 @@ if __name__ == '__main__':
   try:
     gif_loop(ready_img(gifpath))
   except KeyboardInterrupt:
-    #e.clear() # stop gif loop
-    pass
+    e.clear() # stop gif loop
   finally:
     #e.wait() # wait for thread end
     black_scr()

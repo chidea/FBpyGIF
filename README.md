@@ -14,6 +14,8 @@ There are many documents online how to mmap frame buffer with C, but none of sim
 ### To-do
  - [ ] Upload on PyPi to let it be installable with `pip install`.
    - [ ] Make installation script
+ - [x] Proper animtation time delay on every frames
+ - [ ] Optimize with setting screen to RGB mode by sending mailbox message (RGB_to_BGR function will be unused)
  - [ ] Bugfix with wrong ioctl command. `dmesg` shows `bcm2708_fb soc:fb: Unknown ioctl 0x5401`
  - [ ] Wiki documentation about ioctl and mmap with pure Python.
 
