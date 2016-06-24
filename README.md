@@ -25,7 +25,9 @@ There are many documents online how to mmap frame buffer with C, but none of sim
 
 ### How to use
 ```
-sudo python3 fb.py test.gif
+sudo python3 fb.py [directory or file] [delay seconds for static images=30]
 ```
  - Script is written for Python >= 3.
  - Writing directly to frame buffer driver needs superuser priviledge.
+ - `sudo python3 fb.py` will just clear screen to black.
+
