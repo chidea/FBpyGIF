@@ -262,7 +262,7 @@ def gif_loop(gif, event=None):
   
   imgs = []
   for img in ImageSequence.Iterator(gif):
-    imgs.append((RGB_to_BGR(img.convert('RGB')), img.info['duration']/1000))
+    imgs.append((RGB_to_BGR(img.convert('RGB').resize((w,h))), img.info['duration']/1000))
   
   for img, dur in cycle(imgs):
     e=Event()
@@ -282,7 +282,7 @@ if __name__ == '__main__':
   #e.set()
   #Thread(target=gif_loop, args=[ready_img(gifpath),e], daemon=True).start()
   try:
-    gif_loop(ready_img(gifpath).resize((w,h)))
+    gif_loop(ready_img(gifpath))
   except KeyboardInterrupt:
     e.clear() # stop gif loop
   finally:
