@@ -175,7 +175,7 @@ def ready_fb(_bpp = 24, i = 0):
     
     msize = fi[17] # = w*h*bpp//8
     ll, start = fi[-7:-5]
-    bpp, w, h = vi[6], ll//3, vi[3] # when screen is vertical, real length becomes wrong. ll//3 is more acurrate at such time.
+    bpp, w, h = vi[6], ll//3, msize//ll # when screen is vertical, width becomes wrong. ll//3 is more acurrate at such time.
     #xo, yo = vi[4], vi[5]
 
     mm = mmap(f.fileno(), msize, offset=start)
