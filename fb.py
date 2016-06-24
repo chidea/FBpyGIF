@@ -255,7 +255,7 @@ def show_img(img):
   mm.seek(0)
   mm.write(img if type(img) is bytes else img.tobytes())
 
-def gif_loop(gif, event=None):
+def gif_loop(gif, event=None, force_loop=False):
   from PIL import ImageSequence
   from threading import Thread, Event, Timer
   from itertools import cycle
@@ -265,7 +265,7 @@ def gif_loop(gif, event=None):
   for img in ImageSequence.Iterator(gif):
     imgs.append((RGB_to_BGR(img.convert('RGB').resize((w,h))), img.info['duration']/1000))
   
-  for img, dur in cycle(imgs):
+  for img, dur in cycle(imgs) if force_loop else imgs:
     e=Event()
     Timer(dur, lambda e:e.set(), [e]).start()
     show_img(img)
@@ -274,26 +274,48 @@ def gif_loop(gif, event=None):
       break
   if event: event.clear()
 
+def rec_list_dir(path):
+  from os.path import isdir, isfile
+  from imghdr import what
+  if isdir(path):
+    from os import listdir
+    from os.path import join
+    rst = []
+    for f in listdir(path):
+      rst += rec_list_dir(join(path, f))
+    return rst
+  elif isfile(path) and what(path):
+    return [path]
+  return []
+
 if __name__ == '__main__':
   from sys import argv
-  fpath = argv[1] if len(argv)>1 else '/srv/nfs4/com/tmi.gif'
-  
-  if fpath.lower().endswith('.gif'):
-    from threading import Event, Thread
-    e=Event()
-    #e.set()
-    #Thread(target=gif_loop, args=[ready_img(gifpath),e], daemon=True).start()
-    try:
-      gif_loop(ready_img(fpath))
-    except KeyboardInterrupt:
-      e.clear() # stop gif loop
-    finally:
-      #e.wait() # wait for thread end
-      black_scr()
-    #sleep(60)
-    #show_img(ready_img('/srv/nfs4/com/tmi.jpg'))
-    #e=Event()
-    #Thread(target=fill_scr_ani, args=[e], daemon=True).start()
-  else:
+  if len(argv) == 1:
     ready_fb()
-    show_img(RGB_to_BGR(ready_img(fpath).convert('RGB').resize((w,h))))
+    black_scr()
+    exit()
+  
+  if len(argv)<3:
+    DELAY=30
+    print('you can manually set delay for non-animated files by 2nd argument (seconds)')
+  else:
+    DELAY=int(argv[2])
+  fpaths = rec_list_dir(argv[1])
+  print('files to play:', fpaths)
+  from itertools import cycle
+  from time import sleep
+  try:
+    for fpath in cycle(fpaths):
+      if fpath[-4:].lower() == '.gif':
+        from threading import Event, Thread
+        e=Event()
+        gif_loop(ready_img(fpath))
+      else:
+        ready_fb()
+        show_img(RGB_to_BGR(ready_img(fpath).convert('RGB').resize((w,h))))
+        sleep(DELAY)
+  except KeyboardInterrupt:
+    e.clear() # stop gif loop
+  finally:
+    #e.wait() # wait for thread end
+    black_scr()
