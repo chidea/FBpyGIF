@@ -22,3 +22,10 @@ There are many documents online how to mmap frame buffer with C, but none of sim
 ### Tested on
  - Latest Raspbian on Raspberry pi 2 B+
  - Archlinux (No, not with the ARM version on RPi, but the one on a vagrant VM)
+
+### How to use
+```
+sudo python3 fb.py test.gif
+```
+ - Script is written for <= Python 3.
+ - Writing directly to frame buffer driver needs superuser priviledge.
