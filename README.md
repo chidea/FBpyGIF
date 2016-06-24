@@ -27,5 +27,5 @@ There are many documents online how to mmap frame buffer with C, but none of sim
 ```
 sudo python3 fb.py test.gif
 ```
- - Script is written for <= Python 3.
+ - Script is written for Python >= 3.
  - Writing directly to frame buffer driver needs superuser priviledge.
