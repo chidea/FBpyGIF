@@ -282,7 +282,7 @@ if __name__ == '__main__':
   #e.set()
   #Thread(target=gif_loop, args=[ready_img(gifpath),e], daemon=True).start()
   try:
-    gif_loop(ready_img(gifpath))
+    gif_loop(ready_img(gifpath).resize((w,h)))
   except KeyboardInterrupt:
     e.clear() # stop gif loop
   finally:
