@@ -175,7 +175,7 @@ def ready_fb(_bpp = 24, i = 0):
     
     msize = fi[17] # = w*h*bpp//8
     ll, start = fi[-7:-5]
-    bpp, w, h = vi[6], vi[2], vi[3]
+    bpp, w, h = vi[6], ll//3, vi[3] # when screen is vertical, real length becomes wrong. ll//3 is more acurrate at such time.
     #xo, yo = vi[4], vi[5]
 
     mm = mmap(f.fileno(), msize, offset=start)
@@ -241,6 +241,7 @@ def dot(x, y, r, g, b):
 # GIF should have BGR format data
 def ready_img(fpath):
   from PIL import Image
+  if type(fpath) != str: return fpath
   return Image.open(fpath)
 
 def RGB_to_BGR(img):
@@ -275,20 +276,24 @@ def gif_loop(gif, event=None):
 
 if __name__ == '__main__':
   from sys import argv
-  gifpath = argv[1] if len(argv)>1 else '/srv/nfs4/com/tmi.gif'
+  fpath = argv[1] if len(argv)>1 else '/srv/nfs4/com/tmi.gif'
   
-  from threading import Event, Thread
-  e=Event()
-  #e.set()
-  #Thread(target=gif_loop, args=[ready_img(gifpath),e], daemon=True).start()
-  try:
-    gif_loop(ready_img(gifpath))
-  except KeyboardInterrupt:
-    e.clear() # stop gif loop
-  finally:
-    #e.wait() # wait for thread end
-    black_scr()
-  #sleep(60)
-  #show_img(ready_img('/srv/nfs4/com/tmi.jpg'))
-#e=Event()
-#Thread(target=fill_scr_ani, args=[e], daemon=True).start()
+  if fpath.lower().endswith('.gif'):
+    from threading import Event, Thread
+    e=Event()
+    #e.set()
+    #Thread(target=gif_loop, args=[ready_img(gifpath),e], daemon=True).start()
+    try:
+      gif_loop(ready_img(fpath))
+    except KeyboardInterrupt:
+      e.clear() # stop gif loop
+    finally:
+      #e.wait() # wait for thread end
+      black_scr()
+    #sleep(60)
+    #show_img(ready_img('/srv/nfs4/com/tmi.jpg'))
+    #e=Event()
+    #Thread(target=fill_scr_ani, args=[e], daemon=True).start()
+  else:
+    ready_fb()
+    show_img(RGB_to_BGR(ready_img(fpath).convert('RGB').resize((w,h))))
