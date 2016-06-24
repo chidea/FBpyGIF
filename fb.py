@@ -135,7 +135,7 @@ FB_ACCEL_PUV3_UNIGFX=0xa0
 
 
 from mmap import mmap
-from ioctl import *
+from fcntl import *
 import struct
 
 mm = None
