@@ -304,12 +304,12 @@ if __name__ == '__main__':
   print('files to play:', fpaths)
   from itertools import cycle
   from time import sleep
+  from threading import Event
+  e=Event()
   try:
     for fpath in cycle(fpaths):
       if fpath[-4:].lower() == '.gif':
-        from threading import Event, Thread
-        e=Event()
-        gif_loop(ready_img(fpath))
+        gif_loop(ready_img(fpath), e, len(fpaths)==1)
       else:
         ready_fb()
         show_img(RGB_to_BGR(ready_img(fpath).convert('RGB').resize((w,h))))
