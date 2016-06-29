@@ -17,6 +17,9 @@ There are many documents online how to mmap frame buffer with C, but none of sim
  - [x] Proper animtation time delay on every frames
  - [x] Standard argument style launcher
  - [x] Checking Python version
+ - [ ] Add more options to program
+   - [ ] Shuffling
+   - [ ] Picture frame
  - [ ] Layer support
  - [ ] Background loading of next animation file to reduce loading delay between them
  - [ ] Optimize with setting screen to RGB mode by sending mailbox message (RGB_to_BGR function will be unused)
