@@ -18,7 +18,7 @@ There are many documents online how to mmap frame buffer with C, but none of sim
  - [x] Standard argument style launcher
  - [x] Checking Python version
  - [ ] Add more options to program
-   - [ ] Shuffling
+   - [x] Shuffling
    - [ ] Picture frame
  - [ ] Layer support
  - [ ] Background loading of next animation file to reduce loading delay between them
