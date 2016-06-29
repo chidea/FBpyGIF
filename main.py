@@ -16,7 +16,7 @@ argp.add_argument('-nl', '--no-loop', action='store_true', help='Make entire pla
 argp.add_argument('-nr', '--no-recurse', action='store_true', help='Set to don\'t recurse scan into directories.')
 argp.add_argument('-gd', '--global-delay', type=float, help='This time (seconds) applies to entire static/animated images to show for. Animated files will be infinitely looped while this delay. This value will be applied precedece than the \'-sd\' and \'-ad\', \'-al\'.')
 argp.add_argument('-sd', '--static-delay', type=float, default=20, help='This time (seconds) applies to only static images to show for.')
-argp.add_argument('-al', '--animate-loop', type=int, default=1, help='This time (times) applies to only animated images to show for. Animated files will be looped for this count. If it\'s not applied, GIF files will be played for only once of its loop. It precedes \'animate-delay\'.')
+argp.add_argument('-al', '--animate-loop', type=int, help='This time (times) applies to only animated images to show for. Animated files will be looped for this count. If it\'s not applied, GIF files will be played for only once of its loop. It precedes \'animate-delay\'.')
 argp.add_argument('-ad', '--animate-delay', type=float, help='This time (seconds) applies to only animated images to show for. Animated files will be infinitely looped while this delay. If it\'s not applied, GIF files will be played for only once of its loop.')
 argp.add_argument('-fb', type=int, default=0, help='Selects frame buffer driver. /dev/fb[-fb] will be used.')
 argp.add_argument('-sf', '--shuffle', action='store_true', help='Shuffle the playlist.')
@@ -31,6 +31,8 @@ if args.paths:
     args.animate_delay = None
   elif args.animate_delay:
     args.animate_loop = None
+  else:
+    args.animate_loop = 1
 
   # path scan back to the argument
   def rec_list_dir(path, rec=True):
@@ -72,7 +74,9 @@ try:
     from itertools import cycle
     from time import sleep
     from imghdr import what
-    for path in (args.paths if args.no_loop else cycle(args.paths) if not args.shuffle else shuffle(args.paths)):
+    #from shuffle import sfcycle
+    #for path in (args.paths if args.no_loop else cycle(args.paths) if not args.shuffle else sfcycle(args.paths)):
+    for path in (args.paths if args.no_loop else cycle(args.paths)):
       if what(path) == 'gif':
         if args.animate_delay : Timer(args.animate_delay , lambda e:e.set(), [e]).start()
         fb.gif_loop(fb.ready_img(path), e, args.animate_loop if args.animate_loop else True)
