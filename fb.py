@@ -273,7 +273,6 @@ def gif_loop(gif, event=None, force_loop=False):
   for i in range(force_loop if force_loop is int else 1):
     for img, dur in cycle(imgs) if force_loop is True else imgs:
       if event and event.is_set():
-        event.clear()
         return
       Timer(dur, lambda e:e.set(), [e]).start()
       show_img(img)
