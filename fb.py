@@ -255,24 +255,23 @@ def show_img(img):
 
 def _ready_gif(cut):
   return RGB_to_BGR(cut.convert('RGB').resize((w,h))).tobytes(), cut.info['duration']/1000
-def ready_gif(gif):
+def ready_gif(gif, preview=False):
   from PIL import ImageSequence
   #from multiprocessing import Pool
   imgs = []
-  first = True
   for img in ImageSequence.Iterator(gif):
     imgs.append(_ready_gif(img))#.copy())
-    if first:
-      first = False
+    if preview:
+      preview = False
       show_img(imgs[0][0])
   #with Pool(4) as p:
     #imgs=list(p.map(_ready_gif, imgs))
   return imgs
 
-def gif_loop(gif, event=None, force_loop=False):
+def gif_loop(gif, event=None, force_loop=False, preview=False):
   from threading import Thread, Event, Timer
   from itertools import cycle
-  imgs = ready_gif(gif)
+  imgs = ready_gif(gif, preview)
   e = Event()
   for i in range(force_loop if force_loop is int else 1):
     for img, dur in cycle(imgs) if force_loop is True else imgs:
