@@ -19,6 +19,7 @@ argp.add_argument('-sd', '--static-delay', type=float, default=20, help='This ti
 argp.add_argument('-al', '--animate-loop', type=int, default=1, help='This time (times) applies to only animated images to show for. Animated files will be looped for this count. If it\'s not applied, GIF files will be played for only once of its loop. It precedes \'animate-delay\'.')
 argp.add_argument('-ad', '--animate-delay', type=float, help='This time (seconds) applies to only animated images to show for. Animated files will be infinitely looped while this delay. If it\'s not applied, GIF files will be played for only once of its loop.')
 argp.add_argument('-fb', type=int, default=0, help='Selects frame buffer driver. /dev/fb[-fb] will be used.')
+argp.add_argument('-sf', '--shuffle', action='store_true', help='Shuffle the playlist.')
 args = argp.parse_args()
 
 # precedecing arguments
@@ -71,11 +72,13 @@ try:
     from itertools import cycle
     from time import sleep
     from imghdr import what
-    for path in (args.paths if args.no_loop else cycle(args.paths)):
+    for path in (args.paths if args.no_loop else cycle(args.paths) if not args.shuffle else shuffle(args.paths)):
       if what(path) == 'gif':
         if args.animate_delay : Timer(args.animate_delay , lambda e:e.set(), [e]).start()
         fb.gif_loop(fb.ready_img(path), e, args.animate_loop if args.animate_loop else True)
-        if args.animate_delay : e.wait()
+        if args.animate_delay :
+          e.wait()
+          e.clear()
       else: # static images
         fb.show_img(fb.RGB_to_BGR(fb.ready_img(path).convert('RGB').resize((fb.w,fb.h))))
         sleep(args.static_delay)
