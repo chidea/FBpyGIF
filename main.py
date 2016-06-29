@@ -22,18 +22,8 @@ argp.add_argument('-fb', type=int, default=0, help='Selects frame buffer driver.
 argp.add_argument('-sf', '--shuffle', action='store_true', help='Shuffle the playlist.')
 args = argp.parse_args()
 
-# precedecing arguments
 if args.paths:
-  if args.global_delay:
-    args.animate_delay = args.static_delay = args.global_delay
-    args.animate_loop = None
-  elif args.animate_loop:
-    args.animate_delay = None
-  elif args.animate_delay:
-    args.animate_loop = None
-  else:
-    args.animate_loop = 1
-
+  
   # path scan back to the argument
   def rec_list_dir(path, rec=True):
     from os.path import isdir, isfile, exists
@@ -54,7 +44,19 @@ if args.paths:
     paths += rec_list_dir(path, not args.no_recurse)
   args.paths = paths
   del paths
-
+  
+  # precedecing arguments
+  if len(args) == 1 and not args.no_loop:
+    args.animate_delay = args.animate_loop = None
+  elif args.global_delay:
+    args.animate_delay = args.static_delay = args.global_delay
+    args.animate_loop = None
+  elif args.animate_loop:
+    args.animate_delay = None
+  elif args.animate_delay:
+    args.animate_loop = None
+  else:
+    args.animate_loop = 1
 
 # main library loading work
 import fb
@@ -74,9 +76,8 @@ try:
     from itertools import cycle
     from time import sleep
     from imghdr import what
-    #from shuffle import sfcycle
-    #for path in (args.paths if args.no_loop else cycle(args.paths) if not args.shuffle else sfcycle(args.paths)):
-    for path in (args.paths if args.no_loop else cycle(args.paths)):
+    from shuffle import sfcycle
+    for path in (args.paths if args.no_loop else cycle(args.paths) if not args.shuffle else sfcycle(args.paths)):
       if what(path) == 'gif':
         if args.animate_delay : Timer(args.animate_delay , lambda e:e.set(), [e]).start()
         fb.gif_loop(fb.ready_img(path), e, args.animate_loop if args.animate_loop else True)
