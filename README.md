@@ -16,6 +16,7 @@ There are many documents online how to mmap frame buffer with C, but none of sim
    - [ ] Make installation script
  - [x] Proper animtation time delay on every frames
  - [x] Standard argument style launcher
+ - [x] Checking Python version
  - [ ] Layer support
  - [ ] Background loading of next animation file to reduce loading delay between them
  - [ ] Optimize with setting screen to RGB mode by sending mailbox message (RGB_to_BGR function will be unused)
@@ -28,9 +29,10 @@ There are many documents online how to mmap frame buffer with C, but none of sim
 
 ### How to use
 ```
-sudo python3 fb.py [directory or file] [delay seconds for static images=30]
+sudo python3 main.py [directory or file list...]
 ```
- - Script is written for Python >= 3.
+ - `python3 main.py --help` to see all commands.
+ - Library and script is written for Python >= 3.
  - Writing directly to frame buffer driver needs superuser priviledge.
- - `sudo python3 fb.py` will just clear screen to black.
+ - `sudo python3 main.py` will put you into color test mode. (Aware of hypnotising screen ;) )
 
