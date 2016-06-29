@@ -135,7 +135,7 @@ FB_ACCEL_PUV3_UNIGFX=0xa0
 
 
 from mmap import mmap
-from fcntl import *
+from fcntl import ioctl
 import struct
 
 mm = None
@@ -143,7 +143,7 @@ bpp, w, h = 0, 0, 0
 vi, fi = None, None
 _fb_cmap = 'IIPPPP' # start, len, r, g, b, a
 
-def ready_fb(_bpp = 24, i = 0):
+def ready_fb(_bpp = 24, i = 0, layer=0):
   global mm, bpp, w, h, vi, fi
   if mm and bpp == _bpp: return mm, w, h, bpp
   with open('/dev/fb'+str(i), 'r+b')as f:
@@ -183,8 +183,7 @@ def ready_fb(_bpp = 24, i = 0):
 
 def magick(fpath):
   ''' Use ImageMagick to convert to BGR '''
-  global mm, w, h, bpp
-  ready_fb()
+  mm, w, h, bpp = ready_fb()
   from subprocess import check_output, PIPE
   try:
     if b'ImageMagick' not in check_output('convert'):#, stdout=PIPE).stdout:
@@ -251,71 +250,36 @@ def RGB_to_BGR(img):
   return merge('RGB', c)
 
 def show_img(img):
-  ready_fb()
   mm.seek(0)
   mm.write(img if type(img) is bytes else img.tobytes())
 
-def gif_loop(gif, event=None, force_loop=False):
+def _ready_gif(cut):
+  return RGB_to_BGR(cut.convert('RGB').resize((w,h))).tobytes(), cut.info['duration']/1000
+def ready_gif(gif):
   from PIL import ImageSequence
-  from threading import Thread, Event, Timer
-  from itertools import cycle
-  ready_fb()
-  
+  #from multiprocessing import Pool
   imgs = []
   for img in ImageSequence.Iterator(gif):
-    imgs.append((RGB_to_BGR(img.convert('RGB').resize((w,h))), img.info['duration']/1000))
-  
-  for img, dur in cycle(imgs) if force_loop else imgs:
-    e=Event()
-    Timer(dur, lambda e:e.set(), [e]).start()
-    show_img(img)
-    e.wait() # wait for animation frame duration
-    if event and event.is_set():
-      break
-  if event: event.clear()
+    imgs.append(_ready_gif(img))#.copy())
+  #with Pool(4) as p:
+    #imgs=list(p.map(_ready_gif, imgs))
+  return imgs
 
-def rec_list_dir(path):
-  from os.path import isdir, isfile
-  from imghdr import what
-  if isdir(path):
-    from os import listdir
-    from os.path import join
-    rst = []
-    for f in listdir(path):
-      rst += rec_list_dir(join(path, f))
-    return rst
-  elif isfile(path) and what(path):
-    return [path]
-  return []
+def gif_loop(gif, event=None, force_loop=False):
+  from threading import Thread, Event, Timer
+  from itertools import cycle
+  imgs = ready_gif(gif)
+  e = Event()
+  for i in range(force_loop if force_loop is int else 1):
+    for img, dur in cycle(imgs) if force_loop is True else imgs:
+      if event and event.is_set():
+        event.clear()
+        return
+      Timer(dur, lambda e:e.set(), [e]).start()
+      show_img(img)
+      e.wait() # wait for animation frame duration
+      e.clear()
 
 if __name__ == '__main__':
-  from sys import argv
-  if len(argv) == 1:
-    ready_fb()
-    black_scr()
-    exit()
-  
-  if len(argv)<3:
-    DELAY=30
-    print('you can manually set delay for non-animated files by 2nd argument (seconds)')
-  else:
-    DELAY=int(argv[2])
-  fpaths = rec_list_dir(argv[1])
-  print('files to play:', fpaths)
-  from itertools import cycle
-  from time import sleep
-  from threading import Event
-  e=Event()
-  try:
-    for fpath in cycle(fpaths):
-      if fpath[-4:].lower() == '.gif':
-        gif_loop(ready_img(fpath), e, len(fpaths)==1)
-      else:
-        ready_fb()
-        show_img(RGB_to_BGR(ready_img(fpath).convert('RGB').resize((w,h))))
-        sleep(DELAY)
-  except KeyboardInterrupt:
-    e.clear() # stop gif loop
-  finally:
-    #e.wait() # wait for thread end
-    black_scr()
+  print('This is a pure Python library file. If you want to use as stand-alone, use \'main.py\' instead.')
+  exit(1)
