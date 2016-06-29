@@ -259,8 +259,12 @@ def ready_gif(gif):
   from PIL import ImageSequence
   #from multiprocessing import Pool
   imgs = []
+  first = True
   for img in ImageSequence.Iterator(gif):
     imgs.append(_ready_gif(img))#.copy())
+    if first:
+      first = False
+      show_img(imgs[0][0])
   #with Pool(4) as p:
     #imgs=list(p.map(_ready_gif, imgs))
   return imgs
