@@ -254,7 +254,11 @@ def show_img(img):
   mm.write(img if type(img) is bytes else img.tobytes())
 
 def _ready_gif(cut):
-  return RGB_to_BGR(cut.convert('RGB').resize((w,h))).tobytes(), cut.info['duration']/1000
+  dur = 1
+  if cut.info.get('duration'):
+    dur = cut.info['duration']/1000
+  return RGB_to_BGR(cut.convert('RGB').resize((w,h))).tobytes(), dur
+    
 def ready_gif(gif, preview=False):
   from PIL import ImageSequence
   #from multiprocessing import Pool

@@ -12,7 +12,9 @@ from argparse import ArgumentParser
 
 argp = ArgumentParser(description='Plays GIF animation or draws images on to the frame buffer.')
 argp.add_argument('paths', nargs='*', type=str, help='Paths to the directory to scan or to the file to read. Empty list makes it fall into color test mode.')
-argp.add_argument('-nl', '--no-loop', action='store_true', help='Make entire playlist loop forever.')
+argp.add_argument('-ct', '--color-test', action='store_true', help='Beautiful color testing mode')
+argp.add_argument('-nc', '--no-clear', action='store_true', help='Do not clear screen with black on startup and exit.')
+argp.add_argument('-nl', '--no-loop', action='store_true', help='Make entire playlist not to loop forever.')
 argp.add_argument('-nr', '--no-recurse', action='store_true', help='Set to don\'t recurse scan into directories.')
 argp.add_argument('-gd', '--global-delay', type=float, help='This time (seconds) applies to entire static/animated images to show for. Animated files will be infinitely looped while this delay. This value will be applied precedece than the \'-sd\' and \'-ad\', \'-al\'.')
 argp.add_argument('-sd', '--static-delay', type=float, default=20, help='This time (seconds) applies to only static images to show for.')
@@ -23,8 +25,11 @@ argp.add_argument('-fb', type=int, default=0, help='Selects frame buffer driver.
 argp.add_argument('-sf', '--shuffle', action='store_true', help='Shuffle the playlist.')
 args = argp.parse_args()
 
+if not args.paths and not args.color_test:
+  argp.print_help()
+  exit(0)
+
 if args.paths:
-  
   # path scan back to the argument
   def rec_list_dir(path, rec=True):
     from os.path import isdir, isfile, exists
@@ -63,13 +68,14 @@ if args.paths:
 import fb
 
 fb.ready_fb(i=args.fb)
-fb.black_scr()
+if not args.no_clear:
+  fb.black_scr()
 
 from threading import Event, Timer
 e=Event()
 try:
   print('Press Ctrl+C to stop playing')
-  if not args.paths: # color test mode
+  if args.color_test:
     print('Color testing mode')
     fb.fill_scr_ani(event=e, delay=1/30)
   else:
@@ -91,5 +97,6 @@ try:
 except KeyboardInterrupt:
   e.set() # stop gif loop
 finally:
+  if not args.no_clear:
+    fb.black_scr()
   #e.wait() # wait for thread end
-  fb.black_scr()
