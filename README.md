@@ -20,6 +20,7 @@ There are many documents online how to mmap frame buffer with C, but none of sim
  - [ ] Add more options to program
    - [x] Shuffling
    - [ ] Picture frame
+   - [x] Custom clearing
  - [ ] Layer support
  - [ ] Background loading of next animation file to reduce loading delay between them
  - [ ] Optimize with setting screen to RGB mode by sending mailbox message (RGB_to_BGR function will be unused)
