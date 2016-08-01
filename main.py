@@ -10,9 +10,6 @@ The minimum supported version is Python 3.2')
 
 from args import args
 
-if args.clear:
-  argp.print_help()
-  exit(0)
 if not args.paths and not args.color_test:
   argp.print_help()
   exit(0)
@@ -56,6 +53,9 @@ if args.paths:
 import fb
 
 fb.ready_fb(i=args.fb)
+if args.clear:
+  fb.fill_scr(args.clear >> 16, args.clear >> 8 & 0xFF, args.clear  & 0xFF)
+  exit(0)
 if not args.no_clear:
   fb.black_scr()
 
