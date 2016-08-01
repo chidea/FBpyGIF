@@ -10,10 +10,6 @@ The minimum supported version is Python 3.2')
 
 from args import args
 
-if not args.paths and not args.color_test:
-  argp.print_help()
-  exit(0)
-
 if args.paths:
   # path scan back to the argument
   def rec_list_dir(path, rec=True):
