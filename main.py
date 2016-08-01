@@ -12,20 +12,7 @@ from args import args
 
 if args.paths:
   # path scan back to the argument
-  def rec_list_dir(path, rec=True):
-    from os.path import isdir, isfile, exists
-    from imghdr import what
-    rst = []
-    if exists(path):
-      if isdir(path) and rec:
-        from os import listdir
-        from os.path import join
-        for f in listdir(path):
-          rst += rec_list_dir(join(path, f))
-      elif isfile(path) and what(path):
-        rst += [path]
-    return rst
-
+  from path import rec_list_dir
   paths = []
   for path in args.paths:
     paths += rec_list_dir(path, not args.no_recurse)
@@ -64,11 +51,23 @@ try:
     fb.fill_scr_ani(event=e, delay=1/30)
   else:
     print('files to play:', args.paths)
-    from itertools import cycle
     from time import sleep
     from imghdr import what
-    from shuffle import sfcycle
-    for path in (args.paths if args.no_loop else cycle(args.paths) if not args.shuffle else sfcycle(args.paths)):
+    # it : iterator
+    if args.no_loop:
+      if args.shuffle:
+        from random import shuffle
+        it = shuffle(args.paths)
+      else:
+        it = args.paths
+    else:
+      if args.shuffle:
+        from shuffle import sfcycle
+        it = sfcycle(args.paths)
+      else:
+        from itertools import cycle
+        it = cycle(args.paths)
+    for path in it:
       if what(path) == 'gif':
         if args.animate_delay : Timer(args.animate_delay , lambda e:e.set(), [e]).start()
         fb.gif_loop(fb.ready_img(path), e, args.animate_loop if args.animate_loop else True, args.preview)
