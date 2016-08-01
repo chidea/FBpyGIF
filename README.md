@@ -39,3 +39,5 @@ sudo python3 main.py [directory or file list...]
  - Library and script is written for Python >= 3.
  - Writing directly to frame buffer driver needs superuser priviledge.
  - `sudo python3 main.py` will put you into color test mode. (Aware of hypnotising screen ;) )
+ - Utility
+   - `python3 util.py size_cat ~/pictures` will categorize pictures based on its sizes and move into folders horizontal, vertical, square under the directory you run it.
