@@ -39,4 +39,3 @@ sudo python3 main.py [directory or file list...]
  - Library and script is written for Python >= 3.
  - Writing directly to frame buffer driver needs superuser priviledge.
  - `sudo python3 main.py` will put you into color test mode. (Aware of hypnotising screen ;) )
-
