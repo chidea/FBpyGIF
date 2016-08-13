@@ -26,7 +26,6 @@ def hex_int(string):
 argp.add_argument('-c', '--clear', default=-1, type=hex_int, nargs='?', help='Clear the screen with black by default, or give an RGB code to fill with.')
 args = argp.parse_args()
 
-if __name__ == '__main__':
-  if not args.paths and not args.color_test:
-    argp.print_help()
-    exit(0)
+if not args.paths and not args.color_test:
+  argp.print_help()
+  exit(0)
