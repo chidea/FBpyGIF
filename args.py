@@ -23,7 +23,7 @@ def hex_int(string):
   except:
     print(string + " is not a valid hex value(ex. 'FF0000' for red). Replaced with 0(black).")
   return 0
-argp.add_argument('-c', '--clear', default=-1, type=hex_int, nargs='?', help='Clear the screen with black by default, or give an RGB code to fill with.')
+argp.add_argument('-c', '--clear', default=-1, type=hex_int, nargs='?', help='Clear the screen with black by default, or give an RGB code to fill with. ex)FF0000 : pure red, BBBBBB : light grey, FF00FF : fuchsia purple.')
 args = argp.parse_args()
 
 if not args.paths and not args.color_test:
