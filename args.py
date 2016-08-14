@@ -13,13 +13,14 @@ argp.add_argument('-ad', '--animate-delay', type=float, help='This time (seconds
 argp.add_argument('-pv', '--preview', action='store_true', help='Freeze on first frame while loading next frames to preview before playing')
 argp.add_argument('-fb', type=int, default=0, help='Selects frame buffer driver. /dev/fb[-fb] will be used.')
 argp.add_argument('-sf', '--shuffle', action='store_true', help='Shuffle the playlist')
+argp.add_argument('-vb', '--verbose', action='store_true', help='Show verbose information')
 def hex_int(string):
   try:
     v = int('0x'+string, 16)
     if v <= 0xffffff and v >= 0 :
       return v
     else:
-      print(string + " is not in a valid range(0 <= x <= 0xffffff). Replaced with 0(black).")
+      print(string + " is not in a valid range(0 <= x <= ffffff). Replaced with 0(black).")
   except:
     print(string + " is not a valid hex value(ex. 'FF0000' for red). Replaced with 0(black).")
   return 0

@@ -68,6 +68,7 @@ try:
         from itertools import cycle
         it = cycle(args.paths)
     for path in it:
+      if args.verbose: print('playing : '+path)
       if what(path) == 'gif':
         if args.animate_delay : Timer(args.animate_delay , lambda e:e.set(), [e]).start()
         fb.gif_loop(fb.ready_img(path), e, args.animate_loop if args.animate_loop else True, args.preview)
@@ -75,7 +76,7 @@ try:
           e.wait()
           e.clear()
       else: # static images
-        fb.show_img(fb.RGB_to_BGR(fb.ready_img(path).convert('RGB').resize((fb.w,fb.h))))
+        fb.show_img(fb.ready_img(path).convert('RGB').resize((fb.w,fb.h)))
         sleep(args.static_delay)
 except KeyboardInterrupt:
   e.set() # stop gif loop

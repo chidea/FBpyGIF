@@ -142,9 +142,11 @@ mm = None
 bpp, w, h = 0, 0, 0
 vi, fi = None, None
 _fb_cmap = 'IIPPPP' # start, len, r, g, b, a
+RGB = False
+_verbose = False
 
 def ready_fb(_bpp = 24, i = 0, layer=0):
-  global mm, bpp, w, h, vi, fi
+  global mm, bpp, w, h, vi, fi, RGB
   if mm and bpp == _bpp: return mm, w, h, bpp
   with open('/dev/fb'+str(i), 'r+b')as f:
     vi = ioctl(f, FBIOGET_VSCREENINFO, bytes(160))
@@ -157,14 +159,17 @@ def ready_fb(_bpp = 24, i = 0, layer=0):
     #     R        G      B      A        std
     vi[6] = _bpp # 24 bit = BGR 888 mode
     
-    #r_o, r_b, r_e = vi[8:11]
-    #g_o, g_b, g_e = vi[11:14]
-    #b_o, b_b, b_e = vi[14:17]
     #vi[8] = 0
     #vi[14] = 16
     
     vi = ioctl(f, FBIOPUT_VSCREENINFO, struct.pack('I'*40, *vi)) # fb_var_screeninfo
     vi = struct.unpack('I'*40,vi)
+    
+    if vi[8] == 0 : RGB = True
+    #r_o, r_b, r_e = vi[8:11]
+    #g_o, g_b, g_e = vi[11:14]
+    #b_o, b_b, b_e = vi[14:17]
+    
     ffm = 'c'*16+'L'+'I'*4+'H'*3+'ILIIHHH'
     fic = struct.calcsize(ffm)
     fi = struct.unpack(ffm, ioctl(f, FBIOGET_FSCREENINFO, bytes(fic)))
@@ -207,6 +212,8 @@ def fill_scr(r,g,b):
     seed = struct.pack('BBBB', b, g, r, 255)
   elif bpp == 24:
     seed = struct.pack('BBB', b, g, r)
+  elif bpp == 16: # for C.H.I.P.
+    seed = struct.pack('BB', r>>3, g>>2, b>>3)
   show_img(seed * w * h)
 
 def fill_scr_ani(event=None, delay=1/30):
@@ -235,7 +242,7 @@ def white_scr():
 def dot(x, y, r, g, b):
   ready_fb()
   mm.seek((x + y*w) * 3)
-  mm.write(struct.pack('BBB',b,g,r))
+  mm.write(struct.pack('BBB',*((r,g,b) if RGB else (b,g,r))))
 
 # GIF should have BGR format data
 def ready_img(fpath):
@@ -243,6 +250,12 @@ def ready_img(fpath):
   if type(fpath) != str: return fpath
   return Image.open(fpath)
 
+def RGB_to_565(img):
+  from PIL import ImageMath
+  from PIL.Image import merge
+  r,g,b = img.split()
+  return merge('RGB', [a.im.convert('L') for a in ImageMath.eval("r>>3, g>>2, b>>3", r=r, g=g, b=b)])
+  
 def RGB_to_BGR(img):
   from PIL.Image import merge
   c = list(img.split())
@@ -250,14 +263,23 @@ def RGB_to_BGR(img):
   return merge('RGB', c)
 
 def show_img(img):
+  if not type(img) is bytes:
+    if not RGB:
+      img = RGB_to_BGR(img)
+    elif bpp == 16: # for C.H.I.P.
+      img = RGB_to_565(img)
+    img = img.tobytes()
   mm.seek(0)
-  mm.write(img if type(img) is bytes else img.tobytes())
+  mm.write(img)
 
 def _ready_gif(cut):
   dur = 1
   if cut.info.get('duration'):
     dur = cut.info['duration']/1000
-  return RGB_to_BGR(cut.convert('RGB').resize((w,h))).tobytes(), dur
+  cut = cut.convert('RGB').resize((w,h))
+  if not RGB:
+    cut = RGB_to_BGR(cut)
+  return cut.tobytes(), dur
     
 def ready_gif(gif, preview=False):
   from PIL import ImageSequence
