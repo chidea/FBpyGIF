@@ -34,7 +34,7 @@ if args.paths:
 
 # main library loading work
 import fb
-
+fb._verbose = args.verbose
 fb.ready_fb(i=args.fb)
 if args.clear != -1:
   fb.fill_scr(args.clear >> 16, args.clear >> 8 & 0xFF, args.clear  & 0xFF)
