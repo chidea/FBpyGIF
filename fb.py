@@ -300,7 +300,7 @@ def ready_gif(gif, preview=False):
     if len(imgs) >= frame_limit:
       if _verbose:
         #print('This file is too big to play. Limited to play only %d frames in total %d frames.' % (frame_limit, gif.n_frames))
-        print('This file is too big to play. Limited to play only %d frames.' % frame_limit)
+        print('This file is too big to play. Limited to play only %d frames.' % frame_limit )
       break
   #with Pool(4) as p:
     #imgs=list(p.map(_ready_gif, imgs))
