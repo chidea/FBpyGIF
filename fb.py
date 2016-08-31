@@ -254,7 +254,13 @@ def RGB_to_565(img):
   from PIL import ImageMath
   from PIL.Image import merge
   r,g,b = img.split()
-  return merge('RGB', [a.im.convert('L') for a in ImageMath.eval("r>>3, g>>2, b>>3", r=r, g=g, b=b)])
+  t = ImageMath.eval("r>>3<<11 | g>>2<<5 | b>>3", r=r, g=g, b=b).load()
+  w,h = t.size
+  bt=b''
+  for y in range(h):
+    for x in range(w):
+      bt+=t[x,y].to_bytes(2, 'little')
+  return bt
   
 def RGB_to_BGR(img):
   from PIL.Image import merge
@@ -264,11 +270,10 @@ def RGB_to_BGR(img):
 
 def show_img(img):
   if not type(img) is bytes:
-    if not RGB:
-      img = RGB_to_BGR(img)
+    if not RGB: # for RPI
+      img = img.tobytes("raw", "BGR")
     elif bpp == 16: # for C.H.I.P.
       img = RGB_to_565(img)
-    img = img.tobytes()
   mm.seek(0)
   mm.write(img)
 
@@ -291,7 +296,7 @@ def ready_gif(gif, preview=False):
       fm = l
       break
   fm = int(fm.split()[1])*1024
-  frame_limit = fm // (gif.size[0]*gif.size[1]*bpp)
+  frame_limit = fm // (gif.size[0]*gif.size[1]*bpp//8)
   for img in ImageSequence.Iterator(gif):
     imgs.append(_ready_gif(img))#.copy())
     if preview:
