@@ -213,7 +213,7 @@ def fill_scr(r,g,b):
   elif bpp == 24:
     seed = struct.pack('BBB', b, g, r)
   elif bpp == 16: # for C.H.I.P.
-    seed = struct.pack('BB', r>>3, g>>2, b>>3)
+    seed = struct.pack('H', (r<<11 | g<<5 | b))
   show_img(seed * w * h)
 
 def fill_scr_ani(event=None, delay=1/30):
