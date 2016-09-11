@@ -144,9 +144,10 @@ vi, fi = None, None
 _fb_cmap = 'IIPPPP' # start, len, r, g, b, a
 RGB = False
 _verbose = False
+msize_kb = 0
 
 def ready_fb(_bpp = 24, i = 0, layer=0):
-  global mm, bpp, w, h, vi, fi, RGB
+  global mm, bpp, w, h, vi, fi, RGB, msize_kb
   if mm and bpp == _bpp: return mm, w, h, bpp
   with open('/dev/fb'+str(i), 'r+b')as f:
     vi = ioctl(f, FBIOGET_VSCREENINFO, bytes(160))
@@ -177,10 +178,10 @@ def ready_fb(_bpp = 24, i = 0, layer=0):
     # 16 char =id
     # 1025519616, 6220800, 0, 0, 2, 1, 1, 0, 5760, 0, 0, 0, 0, 0, 0)
     # smem_len      type type_aux, visual, xpanstep, ypanstep, ywrapstep, line_length, mmio_start, mmio_len, accel, capabilities, reserved[2]
-    
     msize = fi[17] # = w*h*bpp//8
     ll, start = fi[-7:-5]
-    bpp, w, h = vi[6], ll//3, msize//ll # when screen is vertical, width becomes wrong. ll//3 is more acurrate at such time.
+    bpp, w, h = vi[6], ll//3, msize//ll # when screen is vertical, width becomes wrong. ll//3 is more accurate at such time.
+    msize_kb = w*h*bpp//8//1024 # more accurate FB memory size in kb
     #xo, yo = vi[4], vi[5]
 
     mm = mmap(f.fileno(), msize, offset=start)
@@ -293,10 +294,9 @@ def ready_gif(gif, preview=False):
   fm = ''
   for l in open('/proc/meminfo'):
     if l.startswith('MemFree:'):
-      fm = l
+      fm = int(l.split()[1])
       break
-  fm = int(fm.split()[1])*1024
-  frame_limit = fm // (gif.size[0]*gif.size[1]*bpp//8)
+  frame_limit = fm // msize_kb
   for img in ImageSequence.Iterator(gif):
     imgs.append(_ready_gif(img))#.copy())
     if preview:
