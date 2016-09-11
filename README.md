@@ -30,6 +30,7 @@ There are many documents online how to mmap frame buffer with C, but none of sim
 ### Tested on
  - Latest Raspbian on Raspberry pi 2 B+
  - Archlinux (No, not with the ARM version on RPi, but the one on a vagrant VM)
+ - Ubuntu Mate Xenial on Odroid C2
 
 ### How to use
 ```
