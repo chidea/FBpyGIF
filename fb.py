@@ -146,7 +146,17 @@ RGB = False
 _verbose = False
 msize_kb = 0
 
-def ready_fb(_bpp = 24, i = 0, layer=0):
+def report_fb(i=0, layer=0):
+  with open('/dev/fb'+str(i), 'r+b')as f:
+    vi = ioctl(f, FBIOGET_VSCREENINFO, bytes(160))
+    vi = list(struct.unpack('I'*40, vi))
+    print(vi)
+    ffm = 'c'*16+'L'+'I'*4+'H'*3+'ILIIHHH'
+    fic = struct.calcsize(ffm)
+    fi = struct.unpack(ffm, ioctl(f, FBIOGET_FSCREENINFO, bytes(fic)))
+    print(vi)
+
+def ready_fb(_bpp=24, i=0, layer=0):
   global mm, bpp, w, h, vi, fi, RGB, msize_kb
   if mm and bpp == _bpp: return mm, w, h, bpp
   with open('/dev/fb'+str(i), 'r+b')as f:
