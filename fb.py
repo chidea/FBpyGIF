@@ -158,13 +158,17 @@ def ready_fb(_bpp = 24, i = 0, layer=0):
     # 16, 8, 0, 8, 8, 0, 0, 8, 0, 24, 0, 0, 0, 0, 4294967295, 4294967295, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     #   (bit offset, bits, bigend)         non acv   height(mm) width(mm) accl, pixclock, .....                angle, colorspace, reserved[4]
     #     R        G      B      A        std
+    bpp = vi[6]
     vi[6] = _bpp # 24 bit = BGR 888 mode
     
     #vi[8] = 0
     #vi[14] = 16
-    
-    vi = ioctl(f, FBIOPUT_VSCREENINFO, struct.pack('I'*40, *vi)) # fb_var_screeninfo
-    vi = struct.unpack('I'*40,vi)
+    try:
+      vi = ioctl(f, FBIOPUT_VSCREENINFO, struct.pack('I'*40, *vi)) # fb_var_screeninfo
+      vi = struct.unpack('I'*40,vi)
+      bpp = vi[6]
+    except:
+      pass
     
     if vi[8] == 0 : RGB = True
     #r_o, r_b, r_e = vi[8:11]
@@ -180,7 +184,8 @@ def ready_fb(_bpp = 24, i = 0, layer=0):
     # smem_len      type type_aux, visual, xpanstep, ypanstep, ywrapstep, line_length, mmio_start, mmio_len, accel, capabilities, reserved[2]
     msize = fi[17] # = w*h*bpp//8
     ll, start = fi[-7:-5]
-    bpp, w, h = vi[6], ll//3, msize//ll # when screen is vertical, width becomes wrong. ll//3 is more accurate at such time.
+    # bpp = vi[9]+vi[12]+vi[15]+vi[18]
+    w, h = ll//(bpp//8), vi[1] # when screen is vertical, width becomes wrong. ll//3 is more accurate at such time.
     msize_kb = w*h*bpp//8//1024 # more accurate FB memory size in kb
     #xo, yo = vi[4], vi[5]
 
@@ -271,8 +276,11 @@ def RGB_to_BGR(img):
 
 def show_img(img):
   if not type(img) is bytes:
-    if not RGB: # for RPI
-      img = img.tobytes("raw", "BGR")
+    if not RGB:
+      if bpp == 24: # for RPI
+        img = img.tobytes("raw", "BGR")
+      elif bpp == 32:
+        img = img.tobytes("raw", "BGRA")
     elif bpp == 16: # for C.H.I.P.
       img = RGB_to_565(img)
   mm.seek(0)
@@ -282,9 +290,9 @@ def _ready_gif(cut):
   dur = 1
   if cut.info.get('duration'):
     dur = cut.info['duration']/1000
-  cut = cut.convert('RGB').resize((w,h))
+  cut = cut.convert('RGBA' if bpp == 32 else 'RGB').resize((w,h))
   if not RGB:
-    cut = RGB_to_BGR(cut)
+    return cut.tobytes('raw', 'BGRA' if bpp == 32 else 'BGR'), dur
   return cut.tobytes(), dur
     
 def ready_gif(gif, preview=False):
