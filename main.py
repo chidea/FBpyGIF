@@ -76,7 +76,7 @@ try:
           e.wait()
           e.clear()
       else: # static images
-        fb.show_img(fb.ready_img(path).convert('RGB').resize((fb.w,fb.h)))
+        fb.show_img(fb.ready_img(path).convert('RGB').resize((fb.vw,fb.vh)))
         sleep(args.static_delay)
 except KeyboardInterrupt:
   e.set() # stop gif loop

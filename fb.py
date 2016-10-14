@@ -139,7 +139,8 @@ from fcntl import ioctl
 import struct
 
 mm = None
-bpp, w, h = 0, 0, 0
+bpp, w, h = 0, 0, 0 # framebuffer bpp and size
+vx, vy, vw, vh = 0, 0, 0, 0 #virtual window offset and size
 vi, fi = None, None
 _fb_cmap = 'IIPPPP' # start, len, r, g, b, a
 RGB = False
@@ -156,7 +157,7 @@ def report_fb(i=0, layer=0):
     fi = struct.unpack(ffm, ioctl(f, FBIOGET_FSCREENINFO, bytes(fic)))
     print(fi)
 
-def ready_fb(_bpp=24, i=0, layer=0):
+def ready_fb(_bpp=24, i=0, layer=0, _win=None):
   global mm, bpp, w, h, vi, fi, RGB, msize_kb
   if mm and bpp == _bpp: return mm, w, h, bpp
   with open('/dev/fb'+str(i), 'r+b')as f:
@@ -196,7 +197,19 @@ def ready_fb(_bpp=24, i=0, layer=0):
     ll, start = fi[-7:-5]
     # bpp = vi[9]+vi[12]+vi[15]+vi[18]
     w, h = ll//(bpp//8), vi[1] # when screen is vertical, width becomes wrong. ll//3 is more accurate at such time.
-    msize_kb = w*h*bpp//8//1024 # more accurate FB memory size in kb
+    if _win and type(_win) is tuple and len(_win)==4: # virtual window settings
+      vx, vy, vw, vh = _win
+      if vw == 'w': vw = w
+      if vh == 'h': vh = h
+      vx, vy, vw, vh = map(int, (vw, vy, vw, vh))
+      if vx>=w: vx = 0
+      if vx+vw>w: vw = w - vx
+      if vy>=h: vy = 0
+      if vy+vh>h: vh = h - vy
+    else:
+      vx, vy, vw, vh = 0,0,w,h
+    #msize_kb = w*h*bpp//8//1024 # more accurate FB memory size in kb
+    msize_kb = vw*vh*bpp//8//1024 # more accurate FB memory size in kb
     #xo, yo = vi[4], vi[5]
 
     mm = mmap(f.fileno(), msize, offset=start)
@@ -204,14 +217,13 @@ def ready_fb(_bpp=24, i=0, layer=0):
 
 def magick(fpath):
   ''' Use ImageMagick to convert to BGR '''
-  mm, w, h, bpp = ready_fb()
   from subprocess import check_output, PIPE
   try:
     if b'ImageMagick' not in check_output('convert'):#, stdout=PIPE).stdout:
       return
   except FileNotFoundError:
     return
-  p = run(['convert', '-verbose', '-coalesce', '-resize', "%dx%d"%(w,h), fpath, ('bgr' if bpp < 32 else 'bgra')+':-'], stdout=PIPE, stderr=PIPE, bufsize=0)
+  p = run(['convert', '-verbose', '-coalesce', '-resize', "%dx%d"%(vw,vh), fpath, ('bgr' if bpp < 32 else 'bgra')+':-'], stdout=PIPE, stderr=PIPE, bufsize=0)
   p, m = p.stdout, p.stderr
   from re import findall
   m = len(findall(b'gif\[([0-9]+)\]', m)) # may hang on single frame files
@@ -223,7 +235,6 @@ def magick(fpath):
   return r
 
 def fill_scr(r,g,b):
-  mm, w, h, bpp = ready_fb()
   if bpp == 32:
     seed = struct.pack('BBBB', b, g, r, 255)
   elif bpp == 24:
@@ -255,9 +266,11 @@ def black_scr():
 def white_scr():
   fill_scr(255,255,255)
 
-def dot(x, y, r, g, b):
-  ready_fb()
+def mmseekto(x,y):
   mm.seek((x + y*w) * 3)
+
+def dot(x, y, r, g, b):
+  mmseekto(x,y)
   mm.write(struct.pack('BBB',*((r,g,b) if RGB else (b,g,r))))
 
 # GIF should have BGR format data
@@ -290,14 +303,14 @@ def show_img(img):
         img = RGB_to_565(img)
       else:
         img = img.tobytes()
-  mm.seek(0)
+  mm.seekto(vx,vy)
   mm.write(img)
 
 def _ready_gif(cut):
   dur = 1
   if cut.info.get('duration'):
     dur = cut.info['duration']/1000
-  cut = cut.convert('RGBA' if bpp == 32 else 'RGB').resize((w,h))
+  cut = cut.convert('RGBA' if bpp == 32 else 'RGB').resize((vw,vh))
   if not RGB:
     return cut.tobytes('raw', 'BGRA' if bpp == 32 else 'BGR'), dur
   return cut.tobytes(), dur

@@ -12,6 +12,7 @@ argp.add_argument('-al', '--animate-loop', type=int, help='This time (times) app
 argp.add_argument('-ad', '--animate-delay', type=float, help='This time (seconds) applies to only animated images to show for. Animated files will be infinitely looped while this delay. If it\'s not applied, GIF files will be played for only once of its loop.')
 argp.add_argument('-pv', '--preview', action='store_true', help='Freeze on first frame while loading next frames to preview before playing')
 argp.add_argument('-fb', type=int, default=0, help='Selects frame buffer driver. /dev/fb[-fb] will be used.')
+argp.add_argument('-w', '--win', type=str, help='Virtual window setting. Form should be : x,y,width,height. width and height can be \'w\' or \'h\' to replaced with framebuffer width and height')
 argp.add_argument('-bpp', type=int, default=24, help='Bit per pixels. Most framebuffer drivers uses 24 for 8 bits on each BGR as default. This option tries to update the value and fallback to available driver specified value in case of failure.')
 argp.add_argument('-sf', '--shuffle', action='store_true', help='Shuffle the playlist')
 argp.add_argument('-vb', '--verbose', action='store_true', help='Show verbose information')
@@ -28,6 +29,11 @@ def hex_int(string):
 argp.add_argument('-c', '--clear', default=-1, type=hex_int, nargs='?', help='Clear the screen with black by default, or give an RGB code to fill with. ex)FF0000 : pure red, BBBBBB : light grey, FF00FF : fuchsia purple.')
 args = argp.parse_args()
 
-if not args.paths and not args.color_test:
+if args.win:
+  args.win = tuple(args.win.split(','))
+if __name__ == '__main__':
+  # argument test code
+  print(args)
+elif not args.paths and not args.color_test:
   argp.print_help()
   exit(0)
