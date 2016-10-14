@@ -158,7 +158,7 @@ def report_fb(i=0, layer=0):
     print(fi)
 
 def ready_fb(_bpp=24, i=0, layer=0, _win=None):
-  global mm, bpp, w, h, vi, fi, RGB, msize_kb
+  global mm, bpp, w, h, vi, fi, RGB, msize_kb, vx, vy, vw, vh
   if mm and bpp == _bpp: return mm, w, h, bpp
   with open('/dev/fb'+str(i), 'r+b')as f:
     vi = ioctl(f, FBIOGET_VSCREENINFO, bytes(160))
@@ -197,7 +197,7 @@ def ready_fb(_bpp=24, i=0, layer=0, _win=None):
     ll, start = fi[-7:-5]
     # bpp = vi[9]+vi[12]+vi[15]+vi[18]
     w, h = ll//(bpp//8), vi[1] # when screen is vertical, width becomes wrong. ll//3 is more accurate at such time.
-    if _win and type(_win) is tuple and len(_win)==4: # virtual window settings
+    if _win and len(_win)==4: # virtual window settings
       vx, vy, vw, vh = _win
       if vw == 'w': vw = w
       if vh == 'h': vh = h
@@ -303,8 +303,12 @@ def show_img(img):
         img = RGB_to_565(img)
       else:
         img = img.tobytes()
-  mm.seekto(vx,vy)
-  mm.write(img)
+  from io import BytesIO
+  b = BytesIO(img)
+  s = vw*(bpp//8)
+  for y in range(vh):
+    mmseekto(vx,vy+y)
+    mm.write(b.read(s))
 
 def _ready_gif(cut):
   dur = 1
