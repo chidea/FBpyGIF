@@ -201,7 +201,7 @@ def ready_fb(_bpp=24, i=0, layer=0, _win=None):
       vx, vy, vw, vh = _win
       if vw == 'w': vw = w
       if vh == 'h': vh = h
-      vx, vy, vw, vh = map(int, (vw, vy, vw, vh))
+      vx, vy, vw, vh = map(int, (vx, vy, vw, vh))
       if vx>=w: vx = 0
       if vx+vw>w: vw = w - vx
       if vy>=h: vy = 0
