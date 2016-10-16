@@ -203,9 +203,11 @@ def ready_fb(_bpp=24, i=0, layer=0, _win=None):
       if vh == 'h': vh = h
       vx, vy, vw, vh = map(int, (vx, vy, vw, vh))
       if vx>=w: vx = 0
-      if vx+vw>w: vw = w - vx
       if vy>=h: vy = 0
-      if vy+vh>h: vh = h - vy
+      if vx>w: vw = w - vx
+      else: vw -= vx
+      if vy>h: vh = h - vy
+      else: vh -= vy
     else:
       vx, vy, vw, vh = 0,0,w,h
     #msize_kb = w*h*bpp//8//1024 # more accurate FB memory size in kb
