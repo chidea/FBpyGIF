@@ -310,7 +310,7 @@ def show_img(img):
       elif bpp == 32:
         img = img.tobytes('raw', 'BGRA')
       elif bpp == 16:
-        img = img.tobytes('raw' 'BGR')
+        img = img.tobytes('raw', 'BGR')
         #img = _888_to_565(img)
         from io import BytesIO
         bt = BytesIO(img)
