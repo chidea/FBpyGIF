@@ -312,7 +312,7 @@ def show_img(img):
       elif bpp == 16:
         img = img.tobytes('raw' 'BGR')
         #img = _888_to_565(img)
-        for io import BytesIO
+        from io import BytesIO
         bt = BytesIO(img)
         for y in range(vh):
           mmseekto(vx,vy+y)
