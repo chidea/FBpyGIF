@@ -283,18 +283,7 @@ def dot(x, y, r, g, b):
 def ready_img(fpath):
   from PIL import Image
   if type(fpath) != str: return fpath
-  return Image.open(fpath)
-
-def RGB_to_565(img):
-  from PIL import ImageMath
-  r,g,b = img.split()
-  t = ImageMath.eval("r>>3<<11 | g>>2<<5 | b>>3", r=r, g=g, b=b).load()
-  w,h = img.size
-  bt=b''
-  for y in range(h):
-    for x in range(w):
-      bt+=t[x,y].to_bytes(2, 'little')
-  return bt
+  return Image.open(fpath).resize((vw,vh))
 
 def _888_to_565(bt):
   b = b''
@@ -302,35 +291,41 @@ def _888_to_565(bt):
     b += int.to_bytes(bt[i]>>3<<11|bt[i+1]>>2<<5|bt[i+2]>>3, 2, 'little')
   return b
 
+def numpy_888_565(bt):
+  import numpy as np
+  arr = np.fromstring(bt, dtype=np.uint32)
+  return (((0xF80000 & arr)>>8)|((0xFC00 & arr)>>5)|((0xF8 & arr)>>3)).astype(np.uint16).tostring()
+
 def show_img(img):
   if not type(img) is bytes:
     if not RGB:
       if bpp == 24: # for RPI
         img = img.tobytes('raw', 'BGR')
-      elif bpp == 32:
-        img = img.tobytes('raw', 'BGRA')
-      elif bpp == 16:
-        img = img.tobytes('raw', 'BGR')
-        #img = _888_to_565(img)
-        from io import BytesIO
-        bt = BytesIO(img)
-        for y in range(vh):
-          mmseekto(vx,vy+y)
-          for x in range(vw):
-            b,g,r = [ord(bt.read(1)) for i in range(3)]
-            mm.write(int.to_bytes(b>>3 | g>>2<<5 | r>>3<<11, 2, 'little'))
-        return
+      else:
+        img = img.convert('RGBA').tobytes('raw', 'BGRA')
+        if bpp == 16:
+          img = numpy_888_565(img)
+          #img = img.tobytes('raw', 'BGR')
+          #img = _888_to_565(img)
+          #from io import BytesIO
+          #bt = BytesIO(img)
+          #for y in range(vh):
+          #  mmseekto(vx,vy+y)
+          #  for x in range(vw):
+          #    b,g,r = [ord(bt.read(1)) for i in range(3)]
+          #    mm.write(int.to_bytes(b>>3 | g>>2<<5 | r>>3<<11, 2, 'little'))
+          #return
     else:
       if bpp == 24:
         img = img.tobytes()
-      elif bpp == 32:
-        img = img.tobytes('raw', 'RGBA')
-      elif bpp == 16:
-        img = _888_to_565(img.tobytes())
+      else:
+        img = img.convert('RGBA').tobytes()
+        if bpp == 16:
+          img = numpy_888_565(img)
   from io import BytesIO
   b = BytesIO(img)
   s = vw*bytepp
-  for y in range(vh):
+  for y in range(vh): # virtual window drawing
     mmseekto(vx,vy+y)
     mm.write(b.read(s))
 

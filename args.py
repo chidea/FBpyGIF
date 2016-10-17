@@ -13,7 +13,7 @@ argp.add_argument('-ad', '--animate-delay', type=float, help='This time (seconds
 argp.add_argument('-pv', '--preview', action='store_true', help='Freeze on first frame while loading next frames to preview before playing')
 argp.add_argument('-fb', type=int, default=0, help='Selects frame buffer driver. /dev/fb[-fb] will be used.')
 argp.add_argument('-w', '--win', type=str, help='Virtual window setting. Form should be : x1,y1,x2,y2. x2 and y2 can be \'w\' or \'h\' to replaced with framebuffer width and height')
-argp.add_argument('-bpp', type=int, default=24, help='Bit per pixels. Most framebuffer drivers uses 24 for 8 bits on each BGR as default. This option tries to update the value and fallback to available driver specified value in case of failure.')
+argp.add_argument('-bpp' type=int, default=None, help='Bit per pixels. Most framebuffer drivers uses 24 for 8 bits on each BGR as default. It tries to update the value and fallback to available driver specified value in case of failure. If nothing\'s provided, it uses current framebuffer setting. See framebuffer_depth boot config for details on rpi.')
 argp.add_argument('-sf', '--shuffle', action='store_true', help='Shuffle the playlist')
 argp.add_argument('-vb', '--verbose', action='store_true', help='Show verbose information')
 def hex_int(string):
