@@ -180,6 +180,7 @@ def ready_fb(_bpp=None, i=0, layer=0, _win=None):
         vi = ioctl(f, FBIOPUT_VSCREENINFO, struct.pack('I'*40, *vi)) # fb_var_screeninfo
         vi = struct.unpack('I'*40,vi)
         bpp = vi[6]
+        bytepp = bpp//8
       except:
         pass
     
@@ -309,8 +310,15 @@ def show_img(img):
       elif bpp == 32:
         img = img.tobytes('raw', 'BGRA')
       elif bpp == 16:
-        img = img.tobytes('raw', 'BGR')
-        img = _888_to_565(img)
+        img = img.tobytes('raw' 'BGR')
+        #img = _888_to_565(img)
+        for io import BytesIO
+        bt = BytesIO(img)
+        for y in range(vh):
+          mmseekto(vx,vy+y)
+          for x in range(vw):
+            r,g,b = [ord(bt.read(1)) for i in range(3)]
+            mm.write(int.to_bytes(r>>3<<11 | g>>2<<5 | b>>3, 2, 'little'))
     else:
       if bpp == 24:
         img = img.tobytes()
