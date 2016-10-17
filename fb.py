@@ -315,7 +315,7 @@ def show_img(img):
       elif bpp == 32:
         img = img.tobytes('raw', 'RGBA')
       elif bpp == 16:
-        img = 888_to_565(img.tobytes())
+        img = _888_to_565(img.tobytes())
   from io import BytesIO
   b = BytesIO(img)
   s = vw*(bpp//8)
