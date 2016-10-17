@@ -317,7 +317,7 @@ def show_img(img):
         for y in range(vh):
           mmseekto(vx,vy+y)
           for x in range(vw):
-            r,g,b = [ord(bt.read(1)) for i in range(3)]
+            b,g,r = [ord(bt.read(1)) for i in range(3)]
             mm.write(int.to_bytes(r>>3<<11 | g>>2<<5 | b>>3, 2, 'little'))
     else:
       if bpp == 24:
