@@ -140,6 +140,7 @@ import struct
 
 mm = None
 bpp, w, h = 0, 0, 0 # framebuffer bpp and size
+bytepp = 0
 vx, vy, vw, vh = 0, 0, 0, 0 #virtual window offset and size
 vi, fi = None, None
 _fb_cmap = 'IIPPPP' # start, len, r, g, b, a
@@ -157,7 +158,7 @@ def report_fb(i=0, layer=0):
     fi = struct.unpack(ffm, ioctl(f, FBIOGET_FSCREENINFO, bytes(fic)))
     print(fi)
 
-def ready_fb(_bpp=24, i=0, layer=0, _win=None):
+def ready_fb(_bpp=None, i=0, layer=0, _win=None):
   global mm, bpp, w, h, vi, fi, RGB, msize_kb, vx, vy, vw, vh
   if mm and bpp == _bpp: return mm, w, h, bpp
   with open('/dev/fb'+str(i), 'r+b')as f:
@@ -170,16 +171,17 @@ def ready_fb(_bpp=24, i=0, layer=0, _win=None):
     #   (bit offset, bits, bigend)         non acv   height(mm) width(mm) accl, pixclock, .....                angle, colorspace, reserved[4]
     #     R        G      B      A        std
     bpp = vi[6]
-    vi[6] = _bpp # 24 bit = BGR 888 mode
-    
-    #vi[8] = 0
-    #vi[14] = 16
-    try:
-      vi = ioctl(f, FBIOPUT_VSCREENINFO, struct.pack('I'*40, *vi)) # fb_var_screeninfo
-      vi = struct.unpack('I'*40,vi)
-      bpp = vi[6]
-    except:
-      pass
+    bytepp = bpp//8
+    if _bpp:
+      vi[6] = _bpp # 24 bit = BGR 888 mode
+      #vi[8] = 0
+      #vi[14] = 16
+      try:
+        vi = ioctl(f, FBIOPUT_VSCREENINFO, struct.pack('I'*40, *vi)) # fb_var_screeninfo
+        vi = struct.unpack('I'*40,vi)
+        bpp = vi[6]
+      except:
+        pass
     
     if vi[8] == 0 : RGB = True
     #r_o, r_b, r_e = vi[8:11]
@@ -196,7 +198,7 @@ def ready_fb(_bpp=24, i=0, layer=0, _win=None):
     msize = fi[17] # = w*h*bpp//8
     ll, start = fi[-7:-5]
     # bpp = vi[9]+vi[12]+vi[15]+vi[18]
-    w, h = ll//(bpp//8), vi[1] # when screen is vertical, width becomes wrong. ll//3 is more accurate at such time.
+    w, h = ll//bytepp, vi[1] # when screen is vertical, width becomes wrong. ll//3 is more accurate at such time.
     if _win and len(_win)==4: # virtual window settings
       vx, vy, vw, vh = _win
       if vw == 'w': vw = w
@@ -211,7 +213,7 @@ def ready_fb(_bpp=24, i=0, layer=0, _win=None):
     else:
       vx, vy, vw, vh = 0,0,w,h
     #msize_kb = w*h*bpp//8//1024 # more accurate FB memory size in kb
-    msize_kb = vw*vh*bpp//8//1024 # more accurate FB memory size in kb
+    msize_kb = vw*vh*bytepp//1024 # more accurate FB memory size in kb
     #xo, yo = vi[4], vi[5]
 
     mm = mmap(f.fileno(), msize, offset=start)
@@ -270,7 +272,7 @@ def white_scr():
   fill_scr(255,255,255)
 
 def mmseekto(x,y):
-  mm.seek((x + y*w) * 3)
+  mm.seek((x + y*w) * bytepp)
 
 def dot(x, y, r, g, b):
   mmseekto(x,y)
@@ -295,9 +297,8 @@ def RGB_to_565(img):
 
 def _888_to_565(bt):
   b = b''
-  for i in range(len(bt)):
-    a = i*3
-    b += int.to_bytes(bt[a]>>3<<11|bt[a+1]>>2<<5|bt[a+2]>>3, 2, 'little')
+  for i in range(0, len(bt),3):
+    b += int.to_bytes(bt[i]>>3<<11|bt[i+1]>>2<<5|bt[i+2]>>3, 2, 'little')
   return b
 
 def show_img(img):
@@ -319,7 +320,7 @@ def show_img(img):
         img = _888_to_565(img.tobytes())
   from io import BytesIO
   b = BytesIO(img)
-  s = vw*(bpp//8)
+  s = vw*bytepp
   for y in range(vh):
     mmseekto(vx,vy+y)
     mm.write(b.read(s))
