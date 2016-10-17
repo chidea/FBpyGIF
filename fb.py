@@ -242,7 +242,7 @@ def fill_scr(r,g,b):
   elif bpp == 24:
     seed = struct.pack('BBB', b, g, r)
   elif bpp == 16:
-    seed = struct.pack('H', (r<<11 | g<<5 | b))
+    seed = struct.pack('H', (r>>3<<11 | g>>2<<5 | b>>3))
   show_img(seed * w * h)
 
 def fill_scr_ani(event=None, delay=1/30):
@@ -283,28 +283,39 @@ def ready_img(fpath):
 
 def RGB_to_565(img):
   from PIL import ImageMath
-  from PIL.Image import merge
   r,g,b = img.split()
   t = ImageMath.eval("r>>3<<11 | g>>2<<5 | b>>3", r=r, g=g, b=b).load()
-  w,h = t.size
+  w,h = img.size
   bt=b''
   for y in range(h):
     for x in range(w):
       bt+=t[x,y].to_bytes(2, 'little')
   return bt
-  
+
+def 888_to_565(bt):
+  b = b''
+  for i in range(len(bt)):
+    a = i*3
+    b += int.to_bytes(bt[a]>>3<<11|bt[a+1]>>2<<5|bt[a+2]>>3, 2, 'little')
+  return b
+
 def show_img(img):
   if not type(img) is bytes:
     if not RGB:
       if bpp == 24: # for RPI
-        img = img.tobytes("raw", "BGR")
+        img = img.tobytes('raw', 'BGR')
       elif bpp == 32:
-        img = img.tobytes("raw", "BGRA")
+        img = img.tobytes('raw', 'BGRA')
+      elif bpp == 16:
+        img = img.tobytes('raw', 'BGR')
+        img = 888_to_565(img)
     else:
-      if bpp == 16:
-        img = RGB_to_565(img)
-      else:
+      if bpp == 24:
         img = img.tobytes()
+      elif bpp == 32:
+        img = img.tobytes('raw', 'RGBA')
+      elif bpp == 16:
+        img = 888_to_565(img.tobytes())
   from io import BytesIO
   b = BytesIO(img)
   s = vw*(bpp//8)
