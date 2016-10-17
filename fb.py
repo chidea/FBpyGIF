@@ -159,7 +159,7 @@ def report_fb(i=0, layer=0):
     print(fi)
 
 def ready_fb(_bpp=None, i=0, layer=0, _win=None):
-  global mm, bpp, w, h, vi, fi, RGB, msize_kb, vx, vy, vw, vh
+  global mm, bpp, w, h, vi, fi, RGB, msize_kb, vx, vy, vw, vh, bytepp
   if mm and bpp == _bpp: return mm, w, h, bpp
   with open('/dev/fb'+str(i), 'r+b')as f:
     vi = ioctl(f, FBIOGET_VSCREENINFO, bytes(160))
