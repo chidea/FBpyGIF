@@ -292,7 +292,7 @@ def RGB_to_565(img):
       bt+=t[x,y].to_bytes(2, 'little')
   return bt
 
-def 888_to_565(bt):
+def _888_to_565(bt):
   b = b''
   for i in range(len(bt)):
     a = i*3
@@ -308,7 +308,7 @@ def show_img(img):
         img = img.tobytes('raw', 'BGRA')
       elif bpp == 16:
         img = img.tobytes('raw', 'BGR')
-        img = 888_to_565(img)
+        img = _888_to_565(img)
     else:
       if bpp == 24:
         img = img.tobytes()
