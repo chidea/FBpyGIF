@@ -247,7 +247,7 @@ def fill_scr(r,g,b):
   elif bpp == 16:
     seed = struct.pack('H', r>>3<<11 | g>>2<<5 | b>>3)
   mm.seek(0)
-  mm.write(seed * w * h)
+  show_img(seed * vw * vh)
 
 def fill_scr_ani(event=None, delay=1/30):
   ''' R - G - B transition animation, 30fps delay = 1/30 sec by default '''
