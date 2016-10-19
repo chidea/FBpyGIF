@@ -254,16 +254,16 @@ def fill_scr_ani(event=None, delay=1/30):
   from time import sleep
   while not event or not event.is_set():
     for i in range(256):
+      if event and event.is_set(): event.clear(); return
       fill_scr(i, 255-i, 255) # abc
-      if event and event.is_set(): event.clear(); return
       sleep(delay)
     for i in range(256):
+      if event and event.is_set(): event.clear(); return
       fill_scr(255, i, 255-i) # cab
-      if event and event.is_set(): event.clear(); return
       sleep(delay)
     for i in range(256):
-      fill_scr(255-i, 255, i) # bca
       if event and event.is_set(): event.clear(); return
+      fill_scr(255-i, 255, i) # bca
       sleep(delay)
 
 def black_scr():
