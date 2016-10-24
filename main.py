@@ -71,12 +71,12 @@ try:
       if args.verbose: print('playing : '+path)
       if what(path) == 'gif':
         if args.animate_delay : Timer(args.animate_delay , lambda e:e.set(), [e]).start()
-        fb.gif_loop(fb.ready_img(path), e, args.animate_loop if args.animate_loop else True, args.preview)
+        fb.gif_loop(fb.ready_img(path, False), e, args.animate_loop if args.animate_loop else True, args.preview)
         if args.animate_delay :
           e.wait()
           e.clear()
       else: # static images
-        fb.show_img(fb.ready_img(path).convert('RGB').resize((fb.vw,fb.vh)))
+        fb.show_img(fb.ready_img(path))
         sleep(args.static_delay)
 except KeyboardInterrupt:
   e.set() # stop gif loop

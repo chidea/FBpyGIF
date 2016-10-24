@@ -280,10 +280,10 @@ def dot(x, y, r, g, b):
   mm.write(struct.pack('BBB',*((r,g,b) if RGB else (b,g,r))))
 
 # GIF should have BGR format data
-def ready_img(fpath):
+def ready_img(fpath, resize=True):
   from PIL import Image
-  if type(fpath) != str: return fpath
-  return Image.open(fpath).resize((vw,vh))
+  im = Image.open(fpath)
+  return im.resize((vw,vh)) if resize else im
 
 def _888_to_565(bt):
   b = b''
