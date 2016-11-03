@@ -366,15 +366,15 @@ def gif_loop(gif, event=None, force_loop=False, preview=False):
   from threading import Thread, Event, Timer
   from itertools import cycle
   imgs = ready_gif(gif, preview)
-  e = Event()
+  if event is None : event = Event()
   for i in range(force_loop if force_loop is int else 1):
     for img, dur in cycle(imgs) if force_loop is True else imgs:
       if event and event.is_set():
         return
-      Timer(dur, lambda e:e.set(), [e]).start()
+      Timer(dur, lambda e:event.set(), [event]).start()
       show_img(img)
-      e.wait() # wait for animation frame duration
-      e.clear()
+      event.wait() # wait for animation frame duration
+      event.clear()
 
 if __name__ == '__main__':
   print('This is a pure Python library file. If you want to use as stand-alone, use \'main.py\' instead.')
