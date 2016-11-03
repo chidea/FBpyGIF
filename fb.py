@@ -367,7 +367,7 @@ def gif_loop(gif, event=None, force_loop=False, preview=False):
   from itertools import cycle
   imgs = ready_gif(gif, preview)
   if event is None : event = Event()
-  for i in range(force_loop if force_loop is int else 1):
+  for i in range(force_loop if type(force_loop) is int else 1):
     for img, dur in cycle(imgs) if force_loop is True else imgs:
       if event and event.is_set():
         return
