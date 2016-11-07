@@ -279,6 +279,10 @@ def dot(x, y, r, g, b):
   mmseekto(x,y)
   mm.write(struct.pack('BBB',*((r,g,b) if RGB else (b,g,r))))
 
+def get_pixel(x,y):
+  mmseekto(x,y)
+  return mm.read(bytepp)
+
 # GIF should have BGR format data
 def ready_img(fpath, resize=True):
   from PIL import Image
