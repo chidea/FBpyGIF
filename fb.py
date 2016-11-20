@@ -133,6 +133,7 @@ FB_ACCEL_PROSAVAGE_DDRK=0x8e
 
 FB_ACCEL_PUV3_UNIGFX=0xa0
 
+from PIL.Image import ANTIALIAS
 
 from mmap import mmap
 from fcntl import ioctl
@@ -287,7 +288,7 @@ def get_pixel(x,y):
 def ready_img(fpath, resize=True):
   from PIL import Image
   im = Image.open(fpath)
-  return im.resize((vw,vh)) if resize else im
+  return im.resize((vw,vh), ANTIALIAS) if resize else im
 
 def _888_to_565(bt):
   b = b''
@@ -337,7 +338,7 @@ def _ready_gif(cut):
   dur = 1
   if cut.info.get('duration'):
     dur = cut.info['duration']/1000
-  cut = cut.convert('RGBA' if bpp == 32 else 'RGB').resize((vw,vh))
+  cut = cut.convert('RGBA' if bpp == 32 else 'RGB').resize((vw,vh), ANTIALIAS)
   if not RGB:
     return cut.tobytes('raw', 'BGRA' if bpp == 32 else 'BGR'), dur
   return cut.tobytes(), dur
