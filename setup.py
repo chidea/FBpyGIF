@@ -110,6 +110,7 @@ setup(
     # pip to create the appropriate form of executable for the target platform.
     entry_points={
         'console_scripts': [
+            #'FBpyGIF=FBpyGIF.__main__:main',
             'FBpyGIF=FBpyGIF.__main__:main',
         ],
     },

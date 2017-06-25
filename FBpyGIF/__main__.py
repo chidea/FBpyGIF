@@ -7,3 +7,4 @@ def main(argv=None):
     print('main argv revision with', argv)
   from .main import main as m
   exit(m(argv))
+main()
