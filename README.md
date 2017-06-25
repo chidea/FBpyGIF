@@ -32,6 +32,12 @@ There are many documents online how to mmap frame buffer with C, but none of sim
  - Archlinux (No, not with the ARM version on RPi, but the one on a vagrant VM)
  - Ubuntu Mate Xenial on Odroid C2
 
+### How to install
+```
+  sudo apt install python3-pip
+  sudo pip3 install fbpygif
+```
+
 ### How to use
 ```
 sudo python3 main.py [directory or file list...]

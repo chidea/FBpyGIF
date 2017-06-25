@@ -8,6 +8,12 @@ if version_info.major<3 :
 The minimum supported version is Python 3.2')
   exit(1)
 
+def main(argv=None):
+  pass
+  #if argv is None:
+  #  from sys import argv as sysargv
+  #  argv = sysargv[1:]
+
 from args import args
 
 if args.paths:
