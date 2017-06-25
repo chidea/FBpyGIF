@@ -46,9 +46,11 @@ There are many documents online how to mmap frame buffer with C, but none of sim
 ```
 
 ### How to use
+These three are identical.
 ```
 sudo FBpyGIF [directory or file list...]
 sudo python3 -m FBpyGIF.main [...]
+sudo python3 -m FBpyGIF [...]
 ```
  - `FBpyGIF --help` to see all commands.
  - Library and script is written for Python >= 3.
