@@ -42,7 +42,8 @@ There are many documents online how to mmap frame buffer with C, but none of sim
 ```
   sudo apt install git
   git clone https://github.com/chidea/FBpyGIF
-  python3 FBpyGIF/setup.py install
+  cd FBpyGIF
+  python3 setup.py install
 ```
 
 ### How to use
