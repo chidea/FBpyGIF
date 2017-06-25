@@ -17,7 +17,7 @@ if __name__ == '__main__':
   if 'cat_paths' in args:
     #print('image size categorization')
     def on_each_type(do):
-      from ./path import rrec_list_dir
+      from .path import rrec_list_dir
       from PIL import Image
       for p in rrec_list_dir(args.cat_paths):
         w, h = Image.open(p).size
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     else:
       rstcnt = {}
       def move_cnt(p, t):
-        from ./path import move_file
+        from .path import move_file
         move_file(p, t)
         rstcnt[t] += 1
       from os.path import isdir

@@ -14,11 +14,11 @@ def main(argv=None):
   #  from sys import argv as sysargv
   #  argv = sysargv[1:]
 
-from ./args import args
+from .args import args
 
 if args.paths:
   # path scan back to the argument
-  from ./path import rec_list_dir
+  from .path import rec_list_dir
   paths = []
   for path in args.paths:
     paths += rec_list_dir(path, not args.no_recurse)
@@ -39,7 +39,7 @@ if args.paths:
     args.animate_loop = 1
 
 # main library loading work
-import ./fb
+import .fb
 fb._verbose = args.verbose
 fb.ready_fb(args.bpp, args.fb, _win = args.win)
 if args.clear != -1:
