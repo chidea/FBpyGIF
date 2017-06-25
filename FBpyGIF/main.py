@@ -14,8 +14,8 @@ def main(argv=None):
     argv = sysargv[1:]
   from .args import args, argp
   args.args = argp.parse_args(argv)
-  if len(argv) == 1:
-    args.argp.print_help()
+  if not argv:
+    argp.print_help()
     exit()
   
   if args.paths:
@@ -92,4 +92,4 @@ def main(argv=None):
     if not args.no_clear:
       fb.black_scr()
     #e.wait() # wait for thread end
-#main()
+main()
