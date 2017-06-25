@@ -39,7 +39,7 @@ if args.paths:
     args.animate_loop = 1
 
 # main library loading work
-import .fb
+from .import fb
 fb._verbose = args.verbose
 fb.ready_fb(args.bpp, args.fb, _win = args.win)
 if args.clear != -1:
