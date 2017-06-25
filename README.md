@@ -13,7 +13,7 @@ There are many documents online how to mmap frame buffer with C, but none of sim
 
 ### To-do
  - [ ] Upload on PyPi to let it be installable with `pip install`.
-   - [ ] Make installation script
+   - [x] Make installation script
  - [x] Proper animtation time delay on every frames
  - [x] Standard argument style launcher
  - [x] Checking Python version
