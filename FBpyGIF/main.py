@@ -1,4 +1,4 @@
-if __name__ != '__main__':
+if __name__ != '__main__' and __name__ != 'FBpyGIF.main':
   print('This script is intended to be a launcher of library. Thus it doesn\'t export any useful functions')
   exit(1)
 
@@ -9,12 +9,15 @@ The minimum supported version is Python 3.2')
   exit(1)
 
 def main(argv=None):
-  #if argv is None:
-  #  from sys import argv as sysargv
-  #  argv = sysargv[1:]
+  if argv is None:
+    from sys import argv as sysargv
+    argv = sysargv[1:]
+  from .args import args, argp
+  args.args = argp.parse_args(argv)
+  if len(argv) == 1:
+    args.argp.print_help()
+    exit()
   
-  from .args import args
-
   if args.paths:
     # path scan back to the argument
     from .path import rec_list_dir
@@ -38,7 +41,7 @@ def main(argv=None):
       args.animate_loop = 1
 
   # main library loading work
-  from .import fb
+  from . import fb
   fb._verbose = args.verbose
   fb.ready_fb(args.bpp, args.fb, _win = args.win)
   if args.clear != -1:
@@ -89,3 +92,4 @@ def main(argv=None):
     if not args.no_clear:
       fb.black_scr()
     #e.wait() # wait for thread end
+#main()
