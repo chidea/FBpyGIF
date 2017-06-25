@@ -33,18 +33,26 @@ There are many documents online how to mmap frame buffer with C, but none of sim
  - Ubuntu Mate Xenial on Odroid C2
 
 ### How to install
+ - option1: use pip
 ```
   sudo apt install python3-pip
   sudo pip3 install fbpygif
 ```
+ - option2: use git and setup.py
+```
+  sudo apt install git
+  git clone https://github.com/chidea/FBpyGIF
+  python3 FBpyGIF/setup.py install
+```
 
 ### How to use
 ```
-sudo python3 main.py [directory or file list...]
+sudo FBpyGIF [directory or file list...]
+sudo python3 -m FBpyGIF.main [...]
 ```
- - `python3 main.py --help` to see all commands.
+ - `FBpyGIF --help` to see all commands.
  - Library and script is written for Python >= 3.
  - Writing directly to frame buffer driver needs superuser priviledge.
- - `sudo python3 main.py` will put you into color test mode. (Aware of hypnotising screen ;) )
+ - `FBpyGIF -ct` will put you into color test mode. (Aware of hypnotising screen ;) )
  - Utility
-   - `python3 util.py size_cat ~/pictures` will categorize pictures based on its sizes and move into folders horizontal, vertical, square under the directory you run it.
+   - `python3 -m FBpyGIF.util size_cat ~/pictures` will categorize pictures based on its sizes and move into folders horizontal, vertical, square under the directory you run it.
