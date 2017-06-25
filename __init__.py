@@ -1,1 +1,1 @@
-__all__ = ['FBpyGIF']
+__all__ = ['FBpyGIF', '__main__']
