@@ -30,7 +30,7 @@ argp.add_argument('-c', '--clear', default=-1, type=hex_int, nargs='?', help='Cl
 args = argp.parse_args()
 
 if args.win: args.win = tuple(args.win.split(','))
-if args is None: args = 0
+if args.clear is None: args.clear = 0
 if __name__ == '__main__':
   # argument test code
   print(args)
