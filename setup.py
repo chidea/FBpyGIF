@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """A setuptools based setup module.
 
 See:
@@ -20,9 +21,9 @@ here = path.abspath(path.dirname(__file__))
 # https://stackoverflow.com/questions/26737222/pypi-description-markdown-doesnt-work
 try:
     import pypandoc
-    long_description = pypandoc.convert('README.md', 'rst')
+    long_description = pypandoc.convert('README.md', 'rst').decode()
 except(IOError, ImportError):
-    long_description = open('README.md').read()
+    long_description = open('README.md').read().decode()
 
 setup(
     name='FBpyGIF',

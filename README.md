@@ -33,6 +33,10 @@ There are many documents online how to mmap frame buffer with C, but none of sim
  - Ubuntu Mate Xenial on Odroid C2
 
 ### How to install
+ - prerequisite for pillow (for fresh raspbian)
+```
+  sudo apt install libjpeg8-dev libfreetype6-dev libwebp-dev -y
+```
  - option1: use pip
 ```
   sudo apt install python3-pip
@@ -43,7 +47,7 @@ There are many documents online how to mmap frame buffer with C, but none of sim
   sudo apt install git
   git clone https://github.com/chidea/FBpyGIF
   cd FBpyGIF
-  python3 setup.py install
+  sudo python3 setup.py install
 ```
 
 ### How to use
