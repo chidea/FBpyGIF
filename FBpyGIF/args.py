@@ -35,5 +35,5 @@ if __name__ == '__main__':
   # argument test code
   print(args)
   argp.print_help()
-elif not args.paths and not args.color_test and clear == -1:
+elif not args.paths and not args.color_test and args.clear == -1:
   argp.print_help()
