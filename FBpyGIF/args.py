@@ -29,11 +29,11 @@ def hex_int(string):
 argp.add_argument('-c', '--clear', default=-1, type=hex_int, nargs='?', help='Clear the screen with black by default, or give an RGB code to fill with. ex)FF0000 : pure red, BBBBBB : light grey, FF00FF : fuchsia purple.')
 args = argp.parse_args()
 
-if args.win:
-  args.win = tuple(args.win.split(','))
+if args.win: args.win = tuple(args.win.split(','))
+if args is None: args = 0
 if __name__ == '__main__':
   # argument test code
   print(args)
   argp.print_help()
-elif not args.paths and not args.color_test:
+elif not args.paths and not args.color_test and clear == -1:
   argp.print_help()
