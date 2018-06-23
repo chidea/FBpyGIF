@@ -340,7 +340,7 @@ def _ready_gif(cut):
     dur = cut.info['duration']/1000
   cut = cut.convert('RGBA' if bpp == 32 else 'RGB').resize((vw,vh), ANTIALIAS)
   if not RGB:
-    return cut.tobytes('raw', 'BGRA' if bpp == 32 else 'BGR'), dur
+    return cut, dur
   return cut.tobytes(), dur
     
 def ready_gif(gif, preview=False):
