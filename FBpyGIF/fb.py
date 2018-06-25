@@ -153,11 +153,9 @@ def report_fb(i=0, layer=0):
   with open('/dev/fb'+str(i), 'r+b')as f:
     vi = ioctl(f, FBIOGET_VSCREENINFO, bytes(160))
     vi = list(struct.unpack('I'*40, vi))
-    print(vi)
     ffm = 'c'*16+'L'+'I'*4+'H'*3+'ILIIHHH'
     fic = struct.calcsize(ffm)
     fi = struct.unpack(ffm, ioctl(f, FBIOGET_FSCREENINFO, bytes(fic)))
-    print(fi)
 
 def ready_fb(_bpp=None, i=0, layer=0, _win=None):
   global mm, bpp, w, h, vi, fi, RGB, msize_kb, vx, vy, vw, vh, bytepp
