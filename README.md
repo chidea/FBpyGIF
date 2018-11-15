@@ -35,7 +35,7 @@ There are many documents online how to mmap frame buffer with C, but none of sim
 ### How to install
  - prerequisite for pillow (for fresh raspbian)
 ```
-  sudo apt install libjpeg8-dev libfreetype6-dev libwebp-dev -y
+  sudo apt install libjpeg62-turbo-dev libfreetype6-dev libwebp-dev -y
 ```
  - option1: use pip
 ```
