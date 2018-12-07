@@ -23,7 +23,9 @@ try:
     import pypandoc
     long_description = pypandoc.convert('README.md', 'rst').decode()
 except(IOError, ImportError):
-    long_description = open('README.md').read().decode()
+    long_description = open('README.md').read()
+    if type(long_description) is bytes:
+      long_description = long_description.decode()
 
 setup(
     name='FBpyGIF',
